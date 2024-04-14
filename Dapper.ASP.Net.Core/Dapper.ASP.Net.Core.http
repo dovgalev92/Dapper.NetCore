@@ -1,0 +1,6 @@
+@Dapper.ASP.Net.Core_HostAddress = http://localhost:5225
+
+GET {{Dapper.ASP.Net.Core_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
