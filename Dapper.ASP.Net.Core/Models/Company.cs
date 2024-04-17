@@ -1,6 +1,6 @@
 ﻿namespace Dapper.ASP.Net.Core.Models
 {
-    public class Comapany
+    public class Company
     {
         public int Id { get; set; }
         public string Name { get; set; }
