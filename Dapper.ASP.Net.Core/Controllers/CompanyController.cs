@@ -15,10 +15,14 @@ namespace Dapper.ASP.Net.Core.Controllers
         }
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<IActionResult> CreateCompany([FromBody]CreateCompany create)
+        public async Task<IActionResult> CreateCompany([FromBody] CreateCompany create)
         {
+            if (create == null)
+            {
+                throw new ArgumentNullException(nameof(create));
+            }
             var newCompany = await _companyRepos.CreateCompany(create);
-            return CreatedAtRoute("GetCompanyById", new {id = newCompany.Id }, newCompany);
+            return CreatedAtRoute(nameof(GetCompanyId), new { id = newCompany.Id }, newCompany);
         }
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -27,13 +31,21 @@ namespace Dapper.ASP.Net.Core.Controllers
             var comapany = await _companyRepos.GetCompanies();
             return Ok(comapany);
         }
-        [HttpGet("id")]
+        [HttpGet("{id}", Name = "GetCompanyId")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetCompanyId(int id)
         {
             var companyId = await _companyRepos.GetCompanyId(id);
+            if (companyId == null)
+                return NotFound();
             return Ok(companyId);
         }
-
+        [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> DeleteCompany(int id)
+        {
+            await _companyRepos.DeleteCompany(id);
+            return NoContent();
+        }
     }
 }

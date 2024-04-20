@@ -13,7 +13,6 @@ namespace Dapper.ASP.Net.Core.ImplementationRepos
         {
             _context = context;
         }
-
         public async Task<Company>CreateCompany(CreateCompany create)
         {
             var query = "INSERT INTO Companies(Name, Country) VALUES (@Name, @Country)" +
@@ -36,12 +35,14 @@ namespace Dapper.ASP.Net.Core.ImplementationRepos
                 return createCompany;
             }
         }
-
-        public Task DeleteCompany(int id)
+        public async Task DeleteCompany(int id)
         {
-            throw new NotImplementedException();
+            var query = "DELETE FROM Companies Where id = @id";
+            using (var connection = _context.ConnectionDataBase())
+            {
+                await connection.ExecuteAsync(query, new { id});
+            }
         }
-
         public async Task<IEnumerable<Company>> GetCompanies()
         {
             var query = "SELECT * FROM Companies";
@@ -51,7 +52,6 @@ namespace Dapper.ASP.Net.Core.ImplementationRepos
                 return companyes.ToList();
             }
         }
-
         public async Task<Company> GetCompanyId(int id)
         {
             var query = "SELECT * FROM Companies WHERE Id = @id";
