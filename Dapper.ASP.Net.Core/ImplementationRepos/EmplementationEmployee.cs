@@ -1,28 +1,38 @@
-﻿using Dapper.ASP.Net.Core.Interfaces;
+﻿using Dapper.ASP.Net.Core.Context;
+using Dapper.ASP.Net.Core.Interfaces;
 using Dapper.ASP.Net.Core.Models;
+using Dapper.ASP.Net.Core.Models.DTO;
+using System.Data;
 
 namespace Dapper.ASP.Net.Core.ImplementationRepos
 {
     public class EmplementationEmployee : IEmployeeRepos
     {
-        public Task CreateEmployee(int id, Employee employee)
+        private readonly DapperContext _context;
+        public EmplementationEmployee(DapperContext context)
         {
-            throw new NotImplementedException();
+            _context = context;
         }
-
-        public Task DeleteEmployee(int id)
+        public async Task<Employee>CreateEmployee(CreateEmployee employee)
         {
-            throw new NotImplementedException();
-        }
+            var query = "INSERT INTO Employees(Name, CompanyId) VALUES (@Name, @CompanyId)" +
+                "SELECT CAST (SCOPE_IDENTITY() as int)";
 
-        public Task<Employee> GetEmployeeId(int id)
-        {
-            throw new NotImplementedException();
-        }
+            var parametrs = new DynamicParameters();
+            parametrs.Add("Name", employee.Name, DbType.String);
+            parametrs.Add("CompanyId",employee.CompanyId, DbType.Int32);
 
-        public Task<IEnumerable<Employee>> GetEmployees()
-        {
-            throw new NotImplementedException();
+            using (var connect = _context.ConnectionDataBase())
+            {
+                var idEmpl = await connect.QuerySingleAsync<int>(query, parametrs);
+                var createEmp = new Employee
+                {
+                    Id = idEmpl,
+                    Name = employee.Name,
+                    CompanyId = employee.CompanyId,
+                };
+                return createEmp;
+            }
         }
     }
 }

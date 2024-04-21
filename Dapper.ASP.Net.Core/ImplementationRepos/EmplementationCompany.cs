@@ -25,7 +25,6 @@ namespace Dapper.ASP.Net.Core.ImplementationRepos
             using (var connection = _context.ConnectionDataBase())
             {
                 var id = await connection.QuerySingleAsync<int>(query, parametr);
-
                 var createCompany = new Company
                 {
                     Id = id,
@@ -45,21 +44,36 @@ namespace Dapper.ASP.Net.Core.ImplementationRepos
         }
         public async Task<IEnumerable<Company>> GetCompanies()
         {
-            var query = "SELECT * FROM Companies";
+            var query = "SELECT * FROM Companies c JOIN Employees e ON c.Id = e.CompanyId";
             using (var connection = _context.ConnectionDataBase())
             {
-                var companyes = await connection.QueryAsync<Company>(query);   
-                return companyes.ToList();
+                var dict = new Dictionary<int, Company>();
+                var companies = await connection.QueryAsync<Company, Employee, Company>(
+                    query, (company, employee) =>
+                    {
+                        if (!dict.TryGetValue(company.Id, out var currentCompany))
+                        {
+                            currentCompany = company;
+                            dict.Add(company.Id, currentCompany);
+                        }
+                        currentCompany.Employees.Add(employee);
+                        return currentCompany;
+                    });
+                return companies.Distinct().ToList();
             }
         }
         public async Task<Company> GetCompanyId(int id)
         {
-            var query = "SELECT * FROM Companies WHERE Id = @id";
+            var query = "SELECT * FROM Companies WHERE Id = @id " +
+                  " SELECT * FROM Employees WHERE CompanyId = @id";
 
-            using (var connection = _context.ConnectionDataBase())
+            using ( var connection = _context.ConnectionDataBase())
+            using (var multi = await connection.QueryMultipleAsync(query, new {id}))
             {
-                var getId = await connection.QuerySingleOrDefaultAsync<Company>(query, new { id });
-                return getId;
+                var companies = await multi.ReadSingleOrDefaultAsync<Company>();
+                if (companies != null)
+                companies.Employees = (await multi.ReadAsync<Employee>()).ToList();
+                return companies;
             }
         }
     }

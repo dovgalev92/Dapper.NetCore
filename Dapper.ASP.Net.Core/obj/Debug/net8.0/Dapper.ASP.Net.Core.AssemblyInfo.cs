@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Dapper.ASP.Net.Core")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+12be71b4fa380d1aba50d9e701f9824790f1ac99")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+53a29c0694386c60a31509be70b27a89c688ec17")]
 [assembly: System.Reflection.AssemblyProductAttribute("Dapper.ASP.Net.Core")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Dapper.ASP.Net.Core")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
